@@ -1,3 +1,8 @@
+/* Compile:
+   Windows (MSVC): cl UpdateTool.c
+   Linux (GCC): gcc UpdateTool.c -o UpdateTool
+*/
+
 /** LCF stuff **/
 /* I used my personally library when writing this so I am dumping the necessary things here
    so that it's all in one file. */
@@ -5,7 +10,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 /* Types */
 #define global static
 #define internal static
@@ -175,9 +179,9 @@ b32 chr8_is_whitespace(chr8 c) {
     case '\n':
     case '\t':
     case '\r':
-        return true;
+        return 1;
     default:
-        return false;
+        return 0;
     }
 }
 b32 str8_contains_char(str8 s, chr8 find) {
@@ -353,9 +357,9 @@ Str8List update_file_content(Arena* arena, str8 file_content) {
 
     /* Match with a bunch of sliding windows, skipping when there can't be a match */
     u64 MatchProgress[HAND_Size] = {0};
-    b32 FoundTypePrefix = false;
-    b32 FoundFunctionPrefix = false;
-    u64 Line = 1;
+    b32 FoundTypePrefix = 0;
+    b32 FoundFunctionPrefix = 0;
+    u32 Line = 1;
     str8_iter(file_content) {
         if (c == '\n') {
             Line++;
@@ -363,8 +367,8 @@ Str8List update_file_content(Arena* arena, str8 file_content) {
         if (FoundTypePrefix || FoundFunctionPrefix) {
             if (chr8_is_whitespace(c)
                 || str8_contains_char(str8_lit("(){}[]:;,.<>~?!@#$%^&+-*/'\""), c)) {
-                FoundTypePrefix = false;
-                FoundFunctionPrefix = false;
+                FoundTypePrefix = 0;
+                FoundFunctionPrefix = 0;
             }
         }
         for (u32 t = 0; t < PREFIXES_Size; t++) {  
@@ -372,9 +376,9 @@ Str8List update_file_content(Arena* arena, str8 file_content) {
                 MatchProgress[t]++;  
                 if (MatchProgress[t] == Find[t].len) {  
                     if (t == PREFIX_TYPE) {
-                        FoundTypePrefix = true;
+                        FoundTypePrefix = 1;
                     } else if (t == PREFIX_FUNCTION) {
-                        FoundFunctionPrefix = true;
+                        FoundFunctionPrefix = 1;
                     }  
                     MatchProgress[t] = 0; 
                 }  
@@ -390,7 +394,7 @@ Str8List update_file_content(Arena* arena, str8 file_content) {
                     MatchProgress[t]++;  
                     if (MatchProgress[t] == Find[t].len) {  
                         MatchProgress[t] = 0;
-                        printf("\t[%lld]: Find: %.*s, Repl: %.*s.\n", Line, str8_PRINTF_ARGS(Find[t]), str8_PRINTF_ARGS(Repl[t]));
+                        printf("\t[%u]: Find: %.*s, Repl: %.*s.\n", Line, str8_PRINTF_ARGS(Find[t]), str8_PRINTF_ARGS(Repl[t]));
                         Str8List_add(arena, &out,
                                      str8_first(file_content,
                                                 i + 1 - (Find[t].len + Find[PREFIX_TYPE].len)));
@@ -412,7 +416,7 @@ Str8List update_file_content(Arena* arena, str8 file_content) {
                     MatchProgress[t]++;  
                     if (MatchProgress[t] == Find[t].len) {  
                         MatchProgress[t] = 0;
-                        printf("\t[%lld]: Find: %.*s, Repl: %.*s.\n", Line, str8_PRINTF_ARGS(Find[t]), str8_PRINTF_ARGS(Repl[t]));
+                        printf("\t[%u]: Find: %.*s, Repl: %.*s.\n", Line, str8_PRINTF_ARGS(Find[t]), str8_PRINTF_ARGS(Repl[t]));
                         Str8List_add(arena, &out, str8_first(file_content, i + 1 - Find[t].len));
                         Str8List_add(arena, &out, Repl[t]);
                         file_content = str8_skip(file_content, i+1);
@@ -424,7 +428,7 @@ Str8List update_file_content(Arena* arena, str8 file_content) {
                         }
 
                         if (t == FUN_LINEAR_COMBINE_SSE) {
-                            printf("\t[%lld]: HMM_LinearCombineSSE is now HMM_LinearCombineV4M4, and will now use a fallback method when SSE is not available. \n\tYou no longer need to check for the availability of SSE.\n", Line);
+                            printf("\t[%u]: HMM_LinearCombineSSE is now HMM_LinearCombineV4M4, and will now use a fallback method when SSE is not available. \n\tYou no longer need to check for the availability of SSE.\n", Line);
                         }
 
                         if (t == FUN_VEC) {
@@ -473,14 +477,14 @@ Str8List update_file_content(Arena* arena, str8 file_content) {
                         
                         chr8 check = file_content.str[i+1];
                         if (check == '(') {
-                            printf("\t[%lld]: Find: %.*s, Appending: _RH for old default handedness.\n", Line, str8_PRINTF_ARGS(Find[t]));
+                            printf("\t[%u]: Find: %.*s, Appending: _RH for old default handedness.\n", Line, str8_PRINTF_ARGS(Find[t]));
                             Str8List_add(arena, &out, str8_first(file_content, i + 1));
                             Str8List_add(arena, &out, str8_lit("_RH("));
                             file_content = str8_skip(file_content, i+2);
                             i = -1;
 
                             if (t == HAND_PERSPECTIVE || t == HAND_ROTATE) {
-                                printf("\t[%lld]: ", Line);
+                                printf("\t[%u]: ", Line);
                                 if (t == HAND_PERSPECTIVE) {
                                     printf("HMM_Perspective_RH()");
                                 } else {
