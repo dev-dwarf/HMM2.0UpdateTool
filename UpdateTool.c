@@ -43,6 +43,8 @@ void Arena_reset_all(Arena *a);
 #define LCF_MEMORY_COMMIT_MEMORY(name) b32 name(void* memory, u64 size)
 #define LCF_MEMORY_DECOMMIT_MEMORY(name) void name(void* memory, u64 size)
 #define LCF_MEMORY_FREE_MEMORY(name) void name(void* memory, u64 size)
+/* This implementation of an arena doesn't take advantage of virtual memory at all.
+   It's just convenient to have something portable so I can use the Arena API I'm used to. */
 internal LCF_MEMORY_RESERVE_MEMORY(_lcf_memory_default_reserve) {
     return malloc(size);
 }
