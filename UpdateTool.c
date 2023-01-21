@@ -276,6 +276,7 @@ enum Targets {
     PREFIXES_Size,
     /* Struct/Union types */
     TYPE_VEC, TYPE_MAT, TYPE_QUATERNION, TYPE_BOOL,
+    TYPE_INTERNAL_ELEMENTS_SSE,
     TYPES_Size,
     /* Types in Function Names */
     FUN_VEC, FUN_MAT, FUN_QUATERNION,  
@@ -310,6 +311,8 @@ Str8List update_file_content(Arena* arena, str8 file_content) {
         Repl[TYPE_QUATERNION] = str8_lit("Quat");
         Find[TYPE_BOOL] = str8_lit("bool");
         Repl[TYPE_BOOL] = str8_lit("Bool");
+        Find[TYPE_INTERNAL_ELEMENTS_SSE] = str8_lit(".InternalElementsSSE");
+        Repl[TYPE_INTERNAL_ELEMENTS_SSE] = str8_lit(".SSE");
 
         Find[FUN_VEC] = str8_lit("Vec");
         Repl[FUN_VEC] = str8_lit("V");

@@ -1,6 +1,5 @@
 @REM Batch script to run UpdateTool.exe on all your code files.
-@REM Examples:
-@REM "UpdateHMM2.0" -> Recursively update files in the current folder.
+@REM Example:
 @REM "UpdateHMM2.0 Code\Project\" -> Recursively update all files/folders in .\Code\Project\
 
 for /r %1 %%v in (*.c) do UpdateTool.exe "%%v"

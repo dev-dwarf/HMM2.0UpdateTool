@@ -1,6 +1,5 @@
 # Bash script to run UpdateTool on all your code files.
-# Examples:
-# "UpdateHMM2.0" -> Recursively update files in the current folder.
+# Example:
 # "UpdateHMM2.0 Code/Project/" -> Recursively update all files/folders in ./Code/Project/
 echo $1
 for file in "$1"/*.{c,h,cpp,hpp} "$1"/**/*.{c,h,cpp,hpp} ; do
